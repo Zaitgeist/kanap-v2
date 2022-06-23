@@ -1,12 +1,16 @@
 const productInCart = JSON.parse(localStorage.getItem("cart"));
 const productInApi = "http://localhost:3000/api/products/";
 const cartContainer = document.getElementById("cart__items");
-const priceTotal = document.getElementById("totalPrice")
-const totalQuantity = document.getElementById("totalQuantity")
+const priceTotal = document.getElementById("totalPrice");
+const totalQuantity = document.getElementById("totalQuantity");
 
-async function generateDOM() {
-  if (productInCart == 0) {
-  } else {
+(function(){
+  
+  const prices = {};
+
+  async function generateDOM() {
+    if (productInCart == 0) return;
+    
     for (let i = 0; i < productInCart.length; i++) {
       const products = productInCart[i]
       await fetch("http://localhost:3000/api/products/" + products.id)
@@ -43,6 +47,7 @@ async function generateDOM() {
           productColor.textContent = products.color
           productPrice.textContent = productInfo.price + "€";
 
+          prices[productInfo._id] =  parseInt(productInfo.price);
 
           const productItemSettings = document.createElement("div");
           const productItemSettingsQuantity = document.createElement("div");
@@ -52,6 +57,25 @@ async function generateDOM() {
           const productDelete = document.createElement("p")
           productItemContainer.append(productItemDescription, productItemSettings, productItemDelete);
           productItemContainer.className = "cart__item__content";
+
+          productInputQuantity.addEventListener("change",e => {
+            if (localStorage.getItem("cart")) {
+              if (products !== -1) {
+                products.quantity =productInputQuantity;
+                if (products.quantity > 100) {
+                  alert("Vous avez dépassé le maximum autorisé de ce type de produit dans votre panier et celui ci a été modifié")
+                  products.quantity = 100
+                }
+                if (products.quantity < 0) {
+                  alert("Le nombre minimum de produit dans votre panier est de 1")
+                  products.quantity = 1
+                }
+              }
+              localStorage.setItem('cart', JSON.stringify(productInCart));
+            }
+            qtyTotal()
+            totalPrc()
+          });
 
           productItemSettings.className = "cart__item__content__settings";
           productItemSettings.append(productItemSettingsQuantity);
@@ -72,73 +96,53 @@ async function generateDOM() {
         }
         )
     }
-    qtyChange()
     totalPrc()
   }
-}
-generateDOM();
-//////////////
-//totalqty
-function qtyTotal() {
-  const totalQuantityValue = productInCart.reduce((total, productInCart) => total + parseInt(productInCart.quantity), 0)
-  totalQuantity.textContent = totalQuantityValue
-}
-qtyTotal();
-
-
-
-//totalprice
-function totalPrc() {
-  let totalPrice = 0
-  for (let i = 0; i < productInCart.length; i++) { //Quentin : i+=1 peut se simplifier avec i++
-    totalPrice += productInfo.price * parseInt(products.quantity)
-    console.log(totalPrice) //Quentin : ha il y a un piège ici, on en parle demain ;) 
-    //indice : le javascript à un typage 'dynamique', c'est à dire que le moteur du javascript "décide tout seul comme un grand" le type des entités et les conversions à la volé (mais parfois, pas celle souhaité).             
-    priceTotal.textContent = totalPrice;
+  generateDOM();
+  //////////////
+  //totalqty
+  function qtyTotal() {
+    const totalQuantityValue = productInCart.reduce((total, productInCart) => total + parseInt(productInCart.quantity), 0)
+    totalQuantity.textContent = totalQuantityValue
   }
-}
-totalPrc();
+  qtyTotal();
 
-//change
-function qtyChange() {
-  productInputQuantity.addEventListener("change", (event) => {
-    if (localStorage.getItem("cart")) {
-      if (products !== -1) {
-        products.quantity = productInputQuantity.value;
-        if (products.quantity > 100) {
-          alert("Vous avez dépassé le maximum autorisé de ce type de produit dans votre panier et celui ci a été modifié")
-          products.quantity = 100
-        }
-        if (products.quantity < 0) {
-          alert("Le nombre minimum de produit dans votre panier est de 1")
-          products.quantity = 1
-        }
-      }
-      localStorage.setItem('cart', JSON.stringify(productInCart));
+
+
+
+  //totalprice
+  function totalPrc() {
+    let totalPrice = 0;
+    for (let i = 0; i < productInCart.length; i++) { //Quentin : i+=1 peut se simplifier avec i++
+      const productFromCart = productInCart[i];
+      const priceOfProduct = prices[productFromCart.id];
+
+      totalPrice += priceOfProduct * parseInt(productFromCart.quantity);
+      console.log(totalPrice) //Quentin : ha il y a un piège ici, on en parle demain ;) 
+      //indice : le javascript à un typage 'dynamique', c'est à dire que le moteur du javascript "décide tout seul comme un grand" le type des entités et les conversions à la volé (mais parfois, pas celle souhaité).             
+      priceTotal.textContent = totalPrice;
     }
-    qtyTotal()
-    totalPrc()
   }
-  )
-}
-qtyChange();
+  totalPrc();
 
-//delete
-function deleteProduct() {
-  for (let i = 0; i < productInCart.length; i++) {
-    productDelete.addEventListener("click", (event) => {
-      if (products.id == productInfo._id) { //Quentin : c'est un peu redondant non ? Et ça pète des erreurs consoles
-        cartContainer.removeChild(productCartArticle);
-        productInCart.splice(i, 1);
+  //delete
+  function deleteProduct() {
+    for (let i = 0; i < productInCart.length; i++) {
+      productDelete.addEventListener("click", (event) => {
+        if (products.id == productInfo._id) { //Quentin : c'est un peu redondant non ? Et ça pète des erreurs consoles
+          cartContainer.removeChild(productCartArticle);
+          productInCart.splice(i, 1);
+        }
+        localStorage.setItem('cart', JSON.stringify(productInCart));
+        totalPrc()
+        qtyTotal()
       }
-      localStorage.setItem('cart', JSON.stringify(productInCart));
-      totalPrc()
-      qtyTotal()
+      )
     }
-    )
   }
-}
-deleteProduct();
+  deleteProduct();
+
+})();
 
 
 
