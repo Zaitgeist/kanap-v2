@@ -50,6 +50,7 @@ fetch(api)
         addCartBtn.addEventListener("click", () => {
             if (colorsOptions.value == "") {
                 alert("Merci de selectionner une couleur !")
+                return
             } else if (productQuantity.value <= 0 || productQuantity.value > 100) {
                 alert("Merci de saisir une quantité comprise entre 1 et 100")
             } else {
