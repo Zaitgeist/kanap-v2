@@ -1,15 +1,15 @@
-// on déclare l'url de l'api
+// on déclare l'url de l'api / declaring api url
 const api = 'http://localhost:3000/api/products';
 
 const items = document.getElementById('items');
 
-// on récupere les produits de l'api grace à fetch
+// on récupere les produits de l'api grace à fetch / using fetch to grab product info from the api
 fetch(api)
 	.then((response) => response.json())
 	.then((data) => {
 		for (let product of data) {
 			console.log(product);
-			// on génere le DOM pour les produit avec les informations récuperées précédemment
+			// on génere le DOM pour les produit avec les informations récuperées précédemment / generating the DOM with the info fetched before
 			const article = document.createElement('article');
 			const productLink = document.createElement('a');
 			const productImg = document.createElement('img');
