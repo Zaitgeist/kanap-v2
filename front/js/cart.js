@@ -63,12 +63,12 @@ function generateDOM() {
 					const productDelete = document.createElement('p');
 					productItemContainer.append(productItemDescription, productItemSettings, productItemDelete);
 					productItemContainer.className = 'cart__item__content';
-          productItemDelete.className = 'cart__item__content__settings__delete';
+          			productItemDelete.className = 'cart__item__content__settings__delete';
 					productItemDelete.appendChild(productDelete);
 					productDelete.className = 'deleteItem';
 					productDelete.innerHTML = 'Supprimer';
 
-          productItemSettings.className = 'cart__item__content__settings';
+          			productItemSettings.className = 'cart__item__content__settings';
 					productItemSettings.append(productItemSettingsQuantity);
 					productItemSettingsQuantity.className = 'cart__item__content__settings__quantity';
 					productItemSettings.append(productQuantity, productInputQuantity);
@@ -81,8 +81,7 @@ function generateDOM() {
 					productInputQuantity.value = products.quantity;
 
 					// on écoute le bouton supprimer au clique // listening for click on button
-					productDelete.addEventListener('click', (event) => {
-						for (let i = 0; i < productInCart.length; i++) {
+					productDelete.addEventListener('click', () => {
 							// on cible bien que l'id dans le localstorage correspond bien a l'id du produit actuel // targetting the corresponding product in localstorage
 							if (products.id == productInfo._id) {
 								// puis on supprime la div qui contient le produit et on splice le produit du cart // splice product from cart and modifying the DOM accordingly 
@@ -95,13 +94,13 @@ function generateDOM() {
 							qtyTotal();
 							// si le panier est vide on regénere le DOM // then if the cart is empty rerun the generateDOM function
 							if (productInCart == 0) {
-								generateDOM();
-							}
-						}
-					});
+							generateDOM();
+							}	
+				});
 
 					// on écoute la valeur de la quantité du produit // listening for value change
-					productInputQuantity.addEventListener('change', (event) => {
+					for (let i = 0; i < productInCart.length; i++) {
+					productInputQuantity.addEventListener('change', () => {
 						// si la quantité dans le cart est différente de celle de notre valeur alors on la modifie // if product quantity in cart is different from the input value modify it
 						if (localStorage.getItem('cart')) {
 							if (products !== -1) {
@@ -125,7 +124,7 @@ function generateDOM() {
 						qtyTotal();
 						totalPrc();
 					});
-				});
+				}});
 		}
 	}
 }
@@ -193,62 +192,71 @@ function orderForm() {
 		const email = document.getElementById('email');
 		const errorEmail = document.getElementById('emailErrorMsg');
 
-		// on déclare les REGEX // declaring all the REGEX
-		const regexName = /^[a-zA-ZÀ-ÿ][-,a-z. ']+[ ]*$/;
-		const regexAddress = /^[a-zA-Z0-9\s,'-]*$/;
+		window.addEventListener('load', () =>{
+			errorFirstName.textContent = 'Veuillez saisir un prénom';
+			errorLastName.textContent = 'Veuillez saisir un nom';
+			errorAddress.textContent = 'Veuillez saisir une adresse';
+			errorCity.textContent = 'Veuillez saisir une ville';
+			errorEmail.textContent = 'Veuillez saisir un mail';
+		});
+
+		// on déclare les REGEX // declaring all our regex
+		const regexName = /^[a-zA-ZÀ-ÿ][-,a-z. ']*$/;
+		const regexAddress = /^[a-zA-Z0-9-, ']+$/;
+		const regexCity = /^[a-zA-Z-, ']+$/;
 		const regexEmail = /^[\w\.=-]+@[\w\.-]+\.[\w]{2,3}$/;
 
-		// on écoute les divers champs du formulaire et on teste si leurs valeurs ont une correspondance avec leur regex si ce n'est pas le cas on affiche une erreur // 
+		// on écoute les divers champs du formulaire et on teste si leurs valeurs ont une correspondance avec leur regex si ce n'est pas le cas on affiche une erreur // listening form input for regex correspondance if none display an error
 		firstName.addEventListener('input', () => {
-			if (regexName.test(firstName.value) == false) {
-				errorFirstName.innerHTML = 'Veuillez saisir un prénom valable';
+			if (regexName.test(firstName.value ) == false ) {
+				errorFirstName.textContent = 'Veuillez saisir un prénom';
 			} else {
-				errorFirstName.innerHTML = '';
+				errorFirstName.textContent = '';
 			}
 		});
 
 		lastName.addEventListener('input', () => {
-			if (regexName.test(lastName.value) == false) {
-				errorLastName.innerHTML = 'Veuillez saisir un nom valable';
+			if (regexName.test(lastName.value) == false ) {
+				errorLastName.textContent = 'Veuillez saisir un nom';
 			} else {
-				errorLastName.innerHTML = '';
+				errorLastName.textContent = '';
 			}
 		});
 
 		address.addEventListener('input', () => {
-			if (regexAddress.test(address.value) == false) {
-				errorAddress.innerHTML = 'Veuillez saisir une adresse valable';
+			if (regexAddress.test(address.value ) == false ) {
+				errorAddress.textContent = 'Veuillez saisir une adresse valable';
 			} else {
-				errorLastName.innerHTML = '';
+				errorAddress.textContent = '';
 			}
 		});
-    
+
 		city.addEventListener('input', () => {
-			if (regexAddress.test(city.value) == false) {
-				errorCity.innerHTML = 'Veuillez saisir une ville valable';
+			if (regexCity.test(city.value) == false ) {
+				errorCity.textContent = 'Veuillez saisir une ville';
 			} else {
-				errorLastName.innerHTML = '';
+				errorCity.textContent = '';
 			}
 		});
 
 		email.addEventListener('input', () => {
-			if (regexEmail.test(email.value) == false) {
-				errorEmail.innerHTML = 'Veuillez saisir un mail valable';
+			if (regexEmail.test(email.value) == false ) {
+				errorEmail.textContent = 'Veuillez saisir un mail valable';
 			} else {
-				errorLastName.innerHTML = '';
+				errorEmail.textContent = '';
 			}
 		});
 
-		// on écoute le bouton order et on empéche sa fonction d'origine de fonctionner // listening order button and preventing its default function
+		// on écoute le bouton order et on empéche sa fonction d'origine de fonctionner // lsitening for a click on order button and preventing its defautl function
 		orderBtn.addEventListener('click', (e) => {
 			e.preventDefault();
 
-			// on verifie que le texte dans les champs du formulaire ont tous une correspondance avec nos REGEX si ce n'est pas le cas alert et return // check if form value all got a corresponding value with their respective REGEX if not alert and return
+			// on verifie que le texte dans les champs du formulaire ont tous une correspondance avec nos regex si ce n'est pas le cas alert et return // testing the value in the form if one doesnt correspond alert and return
 			if (
 				regexName.test(firstName.value) == false ||
 				regexName.test(lastName.value) == false ||
 				regexAddress.test(address.value) == false ||
-				regexAddress.test(city.value) == false ||
+				regexCity.test(city.value) == false ||
 				regexEmail.test(email.value) == false
 			) {
 				alert('Veuillez renseigner correctement le formulaire de contact');
@@ -267,7 +275,7 @@ function orderForm() {
 				productInCart.forEach((product) => {
 					products.push(product.id);
 				});
-				// on stock les 2 variable precendete dans un objet // putting both contact and products inside an object
+				// on stock les 2 variable precedente dans un objet // putting both contact and products inside an object
 				let orderContent = { contact, products };
 
 				// on utilise la requete POST sur l'API FETCH et on ajoute dans notre requête notre objet encodé en JSON string // using fetch post and adding the object in JSON string

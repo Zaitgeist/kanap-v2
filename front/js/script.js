@@ -8,7 +8,6 @@ fetch(api)
 	.then((response) => response.json())
 	.then((data) => {
 		for (let product of data) {
-			console.log(product);
 			// on génere le DOM pour les produit avec les informations récuperées précédemment / generating the DOM with the info fetched before
 			const article = document.createElement('article');
 			const productLink = document.createElement('a');
